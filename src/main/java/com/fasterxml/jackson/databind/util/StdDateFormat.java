@@ -50,6 +50,8 @@ public class StdDateFormat
      */
     protected final static String DATE_FORMAT_STR_RFC1123 = "EEE, dd MMM yyyy HH:mm:ss zzz";
 
+    protected final static String DATE_FORMAT_STR_MBOS = "yyyy-MM-dd HH:mm:ss.SSS";
+
     /**
      * For error messages we'll also need a list of all formats.
      */
@@ -57,7 +59,9 @@ public class StdDateFormat
         DATE_FORMAT_STR_ISO8601,
         DATE_FORMAT_STR_ISO8601_Z,
         DATE_FORMAT_STR_RFC1123,
-        DATE_FORMAT_STR_PLAIN
+        DATE_FORMAT_STR_PLAIN,
+        DATE_FORMAT_STR_MBOS
+
     };
 
     /**
@@ -77,6 +81,8 @@ public class StdDateFormat
 
     protected final static DateFormat DATE_FORMAT_PLAIN;
 
+    protected final static DateFormat DATE_FORMAT_MBOS;
+
     /* Let's construct "blueprint" date format instances: can not be used
      * as is, due to thread-safety issues, but can be used for constructing
      * actual instances more cheaply (avoids re-parsing).
@@ -94,6 +100,8 @@ public class StdDateFormat
         DATE_FORMAT_ISO8601_Z.setTimeZone(DEFAULT_TIMEZONE);
         DATE_FORMAT_PLAIN = new SimpleDateFormat(DATE_FORMAT_STR_PLAIN, DEFAULT_LOCALE);
         DATE_FORMAT_PLAIN.setTimeZone(DEFAULT_TIMEZONE);
+        DATE_FORMAT_MBOS = new SimpleDateFormat(DATE_FORMAT_STR_MBOS, DEFAULT_LOCALE);
+        DATE_FORMAT_MBOS.setTimeZone(DEFAULT_TIMEZONE);
     }
     
     /**
@@ -113,6 +121,7 @@ public class StdDateFormat
     protected transient DateFormat _formatISO8601;
     protected transient DateFormat _formatISO8601_z;
     protected transient DateFormat _formatPlain;
+    protected transient DateFormat _formatMBOS;
 
     /*
     /**********************************************************
@@ -249,6 +258,7 @@ public class StdDateFormat
             _formatISO8601 = null;
             _formatISO8601_z = null;
             _formatPlain = null;
+            _formatMBOS = null;
             _timezone = tz;
         }
     }
@@ -375,6 +385,11 @@ public class StdDateFormat
             df = _formatPlain;
             if (df == null) {
                 df = _formatPlain = _cloneFormat(DATE_FORMAT_PLAIN, DATE_FORMAT_STR_PLAIN, _timezone, _locale);
+            }
+        }  else if(len <= 23 && Character.isDigit(c)) {
+            df = _formatMBOS;
+            if(df == null) {
+                df = _formatMBOS = _cloneFormat(DATE_FORMAT_MBOS, DATE_FORMAT_STR_MBOS, _timezone, _locale);
             }
         } else if (c == 'Z') {
             df = _formatISO8601_z;
